@@ -1,0 +1,5 @@
+{
+  "name": "RPG Creature Crafter2",
+  "description": "An interactive tool to create custom creatures for your role-playing game based on the provided rulebook. Step-by-step, design your adversaries from concept to a complete stat block.",
+  "requestFramePermissions": []
+}
