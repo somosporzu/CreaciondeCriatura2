@@ -12,6 +12,16 @@ declare global {
 }
 
 // ===================================================
+// UTILITIES
+// ===================================================
+
+let uniqueIdCounter = 0;
+const generateUniqueId = (prefix: string = 'id'): string => {
+  uniqueIdCounter += 1;
+  return `${prefix}-${Date.now()}-${uniqueIdCounter}`;
+}
+
+// ===================================================
 // TYPES
 // ===================================================
 
@@ -265,7 +275,7 @@ const ALL_TRAITS: Trait[] = [
   { name: 'Sentido del Peligro', cost: 2, category: 'Aura y Percepción', description: 'No puede ser sorprendida en combate.', restriction: null },
   { name: 'Percepción Sísmica', cost: 1, category: 'Aura y Percepción', description: 'Siente la ubicación de cualquier criatura en contacto con el suelo en un radio de 10m.', restriction: null },
   { name: 'Camuflaje', cost: 1, category: 'Aura y Percepción', description: 'Tiene ventaja en sigilo para esconderse siempre que permanezca inmóvil.', restriction: null },
-  { name: 'Olor Nauseabundo', cost: 1, category: 'Aura y Percepción', description: 'Quien empiece su turno a 3m debe superar una Salvación de Cuerpo (ND 12) o tendrá desventaja en su próximo ataque.', restriction: null },
+  { name: 'Olor Nauseabundo', cost: 1, category: 'Aura y Percepción', description: 'Quien empiece su turno a 3m debe superar una Salvación de Cuerpo (ND 12) o terá desventaja en su próximo ataque.', restriction: null },
   { name: 'Sentido Ciego', cost: 2, category: 'Aura y Percepción', description: '`Ve` en un radio de 10m sin usar los ojos. No puede ser Cegado.', restriction: null },
   { name: 'Aura Elemental', cost: 2, category: 'Aura y Percepción', description: 'Al inicio del turno de la criatura, todos a 3m de ella sufren 1d6 de dano elemental.', restriction: null },
   { name: 'Aura de Lentitud', cost: 2, category: 'Aura y Percepción', description: 'El área en un radio de 5m alrededor de la criatura es terreno difícil para sus enemigos.', restriction: null },
@@ -339,11 +349,15 @@ const ALL_SHIELDS: Shield[] = [
     { name: 'Escudo de Torre', type: 'Pesado', defenseBonus: 4, cuerpoRequirement: 4, sigiloPenalty: -3, cost: 'N/A' },
 ];
 
-const createMap = (array, key) => {
-  return array.reduce((acc, item) => {
+const createMap = <T extends Record<K, string | number>, K extends keyof T>(
+  array: readonly T[],
+  key: K
+): Record<T[K], T> => {
+  // Fix: Add explicit types for the accumulator to ensure type safety.
+  return array.reduce((acc: Record<T[K], T>, item) => {
     acc[item[key]] = item;
     return acc;
-  }, {});
+  }, {} as Record<T[K], T>);
 };
 
 const ND_MAP = createMap(CHALLENGE_RATINGS, 'nd');
@@ -609,16 +623,22 @@ const CreatureSheet = ({ creature }) => {
       });
       return [...weaponAttacks, ...creature.attacks];
   }, [creature.equippedWeapons, creature.attacks]);
-  const { vulnerabilities, resistances, immunities, otherTraits } = useMemo(() => {
-    const vulnerabilities = []; const resistances = []; const immunities = [];
-    const otherTraitCounts = new Map();
+// Fix: Added explicit types to arrays and Map to ensure type safety and correct inference downstream, preventing errors with component props.
+const { vulnerabilities, resistances, immunities, otherTraits } = useMemo(() => {
+    const vulnerabilities: DamageType[] = [];
+    const resistances: DamageType[] = [];
+    const immunities: DamageType[] = [];
+    const otherTraitCounts = new Map<string, { trait: Trait; count: number }>();
     creature.traits.filter(trait => !trait.isCategoryAbility).forEach(trait => {
         if (trait.name === 'Vulnerable' && trait.appliedData?.damageType) { vulnerabilities.push(trait.appliedData.damageType); }
         else if (trait.name === 'Resistente' && trait.appliedData?.damageType) { resistances.push(trait.appliedData.damageType); }
         else if (trait.name === 'Inmune' && trait.appliedData?.damageType) { immunities.push(trait.appliedData.damageType); }
         else {
             const key = `${trait.name}|${JSON.stringify(trait.appliedData ?? {})}`;
-            if (otherTraitCounts.has(key)) { otherTraitCounts.get(key).count++; }
+            if (otherTraitCounts.has(key)) {
+                // Fix: Add a non-null assertion as `has` check guarantees existence.
+                otherTraitCounts.get(key)!.count++;
+            }
             else { otherTraitCounts.set(key, { trait: trait, count: 1 }); }
         }
     });
@@ -1199,7 +1219,13 @@ const TraitSelector = ({ creature, addTrait, removeTrait }) => {
   const groupedTraits = useMemo(() => {
     const availableTraits = ALL_TRAITS.filter(t => t.name !== 'Mejora de Atributo' && t.name !== 'Deficiencia de Atributo');
     // Fix: Provide a type for the initial accumulator in reduce to avoid 'traits' being of type 'unknown'.
-    return availableTraits.reduce((acc: Record<TraitCategory, Trait[]>, trait) => { const category = trait.category; if (!acc[category]) { acc[category] = []; } acc[category].push(trait); return acc; }, {} as Record<TraitCategory, Trait[]>);
+    const initialValue: Record<TraitCategory, Trait[]> = {};
+    return availableTraits.reduce((acc, trait) => { 
+        const category = trait.category; 
+        if (!acc[category]) { acc[category] = []; } 
+        acc[category].push(trait); 
+        return acc; 
+    }, initialValue);
   }, []);
   const handleToggleCategory = (category) => { setOpenCategory(prev => (prev === category ? null : category)); };
   const handleAddTraitClick = (trait) => {
@@ -1339,7 +1365,7 @@ const App = () => {
           const creatureToSave = { ...currentCreature };
           let newSavedCreatures;
           if (creatureToSave.id) { newSavedCreatures = savedCreatures.map(c => c.id === creatureToSave.id ? creatureToSave : c); }
-          else { creatureToSave.id = Date.now().toString(); newSavedCreatures = [...savedCreatures, creatureToSave]; }
+          else { creatureToSave.id = generateUniqueId('creature'); newSavedCreatures = [...savedCreatures, creatureToSave]; }
           updateSavedCreatures(newSavedCreatures);
           return creatureToSave;
       });
@@ -1395,11 +1421,11 @@ const App = () => {
         if (delta === 1) {
             const deficienciaIndex = newCreature.traits.findIndex(t => t.name === 'Deficiencia de Atributo' && t.appliedData?.attribute === attr);
             if (deficienciaIndex > -1) { newCreature.traits.splice(deficienciaIndex, 1); }
-            else { newCreature.traits.push({ ...mejoraTraitTemplate, appliedData: { attribute: attr }, instanceId: Date.now().toString(36) + Math.random().toString(36).substr(2) }); }
+            else { newCreature.traits.push({ ...mejoraTraitTemplate, appliedData: { attribute: attr }, instanceId: generateUniqueId('trait') }); }
         } else {
             const mejoraIndex = newCreature.traits.findIndex(t => t.name === 'Mejora de Atributo' && t.appliedData?.attribute === attr);
             if (mejoraIndex > -1) { newCreature.traits.splice(mejoraIndex, 1); }
-            else { newCreature.traits.push({ ...deficienciaTraitTemplate, appliedData: { attribute: attr }, instanceId: Date.now().toString(36) + Math.random().toString(36).substr(2) }); }
+            else { newCreature.traits.push({ ...deficienciaTraitTemplate, appliedData: { attribute: attr }, instanceId: generateUniqueId('trait') }); }
         }
         newCreature.attributes[attr] = newValue;
         
@@ -1459,7 +1485,7 @@ const App = () => {
   };
 
   const addTrait = (trait) => {
-    const newTrait = { ...trait, instanceId: Date.now().toString(36) + Math.random().toString(36).substr(2) };
+    const newTrait = { ...trait, instanceId: generateUniqueId('trait') };
     setCreature(prev => ({ ...prev, traits: [...prev.traits, newTrait] }));
   };
 
