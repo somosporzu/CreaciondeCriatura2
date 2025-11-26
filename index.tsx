@@ -31,6 +31,8 @@ type CategoryKey = 'Bestia' | 'Monstruo' | 'Espíritu' | 'Exaltado' | 'Corrupto'
 type TraitCategory = 'Atributos y Vitalidad' | 'Ofensivos' | 'Defensivos' | 'Movilidad' | 'Aura y Percepción' | 'Control y Únicos';
 type DamageType = 'Cortante' | 'Penetrante' | 'Contundente' | 'Fuego' | 'Hielo' | 'Eléctrico' | 'Corrosivo' | 'Radiante' | 'Mental' | 'Variable';
 type MovementType = 'Nadar' | 'Trepar' | 'Excavar';
+type StatusEffect = 'Asfixiado' | 'Asustado' | 'Aturdido' | 'Controlado' | 'Derribado' | 'Dormido' | 'Encantado' | 'Envenenado' | 'Envenenado Mayor' | 'Inmovilizado' | 'Quemado' | 'Quemado Mayor';
+
 
 interface WeaponProperty {
   name: 'Ligera' | 'Pesada' | 'A dos manos' | 'Versátil' | 'Arrojadiza' | 'Alcance' | 'Rango' | 'Recarga';
@@ -114,6 +116,7 @@ interface Trait {
     concepto?: string;
     nature?: string;
     movementType?: MovementType;
+    statusEffect?: StatusEffect;
   }
 }
 
@@ -211,6 +214,10 @@ const ALL_CONCEPTS: string[] = [
 
 const MOVEMENT_TYPES: MovementType[] = ['Nadar', 'Trepar', 'Excavar'];
 
+const STATUS_EFFECTS: StatusEffect[] = [
+    'Asfixiado', 'Asustado', 'Aturdido', 'Controlado', 'Derribado', 'Dormido', 'Encantado', 'Envenenado', 'Envenenado Mayor', 'Inmovilizado', 'Quemado', 'Quemado Mayor'
+];
+
 const ALL_TRAITS: Trait[] = [
   // Atributos y Vitalidad
   { name: 'Mejora de Atributo', cost: 2, category: 'Atributos y Vitalidad', description: 'Aumenta en +1 uno de los Atributos Primarios (Cuerpo, Destreza o Aura). Puede comprarse varias veces.', restriction: null },
@@ -218,6 +225,7 @@ const ALL_TRAITS: Trait[] = [
   { name: 'Vitalidad Aumentada', cost: 1, category: 'Atributos y Vitalidad', description: 'Aumenta la Resistencia máxima de la criatura en +10. Puede comprarse varias veces.', restriction: null },
   { name: 'Versatilidad Conceptual', cost: 2, category: 'Atributos y Vitalidad', description: 'La criatura aprende un nuevo Concepto de la lista general (Ej: Guerrero, Cazador, Espía).', restriction: null },
   { name: 'Versatilidad de Carácter', cost: 1, category: 'Atributos y Vitalidad', description: 'La criatura aprende una nueva Naturaleza de la lista general (Ej: Cautelosamente, Rápidamente).', restriction: null },
+  // Ofensivos
   { name: 'Ataque Adicional', cost: 1, category: 'Ofensivos', description: 'Puede hacer un segundo ataque en su turno (sin sumar su Bono de Ataque).', restriction: null },
   { name: 'Alcance Mejorado', cost: 1, category: 'Ofensivos', description: 'El alcance de sus ataques cuerpo a cuerpo aumenta en 3 metros.', restriction: null },
   { name: 'Ataque Poderoso', cost: 1, category: 'Ofensivos', description: 'Puede elegir sufrir -2 a su tirada de ataque para ganar +3 al daño.', restriction: null },
@@ -229,14 +237,17 @@ const ALL_TRAITS: Trait[] = [
   { name: 'Golpe Debilitante', cost: 2, category: 'Ofensivos', description: 'Cuando impacta un ataque, el objetivo sufre una penalización de -1 a todas sus acciones hasta el final de su próximo turno.', restriction: null },
   { name: 'Furia', cost: 2, category: 'Ofensivos', description: 'Mientras tenga la mitad de su Resistencia o menos, sus ataques infligen 1d6 de daño adicional.', restriction: null },
   { name: 'Veneno de Contacto', cost: 2, category: 'Ofensivos', description: 'Al impactar, el objetivo debe superar una Salvación de Cuerpo (ND 13) o quedar Envenenado.', restriction: null },
+  { name: 'Estado añadido', cost: 2, category: 'Ofensivos', description: 'Al impactar con un ataque, el objetivo debe superar una Salvación de Aura (ND 12) o sufrir un estado alterado seleccionado.', restriction: null },
   { name: 'Corrosión', cost: 2, category: 'Ofensivos', description: 'Sus ataques Corrosivos reducen el bono de la armadura del objetivo en 1 punto permanentemente.', restriction: null },
   { name: 'Francotirador', cost: 1, category: 'Ofensivos', description: 'No sufre penalización por atacar a larga distancia con armas de rango.', restriction: null },
   { name: 'Combate a Ciegas', cost: 2, category: 'Ofensivos', description: 'No sufre penalizaciones a sus ataques por no poder ver a su objetivo.', restriction: null },
   { name: 'Ataque Vorpal', cost: 3, category: 'Ofensivos', description: 'En un golpe crítico, el ataque inflige el triple de daño en lugar del doble.', restriction: null },
   { name: 'Ráfaga', cost: 3, category: 'Ofensivos', description: 'Si reduce a una criatura a 0 de Resistencia, puede realizar un ataque adicional como Acción Rápida.', restriction: null },
+  // Defensivos
   { name: 'Armadura Natural', cost: 1, category: 'Defensivos', description: '+1 a la Defensa. (Comprable varias veces).', restriction: null },
   { name: 'Resistente', cost: 1, category: 'Defensivos', description: 'Gana Resistencia a un tipo de daño.', restriction: null },
   { name: 'Inmune', cost: 2, category: 'Defensivos', description: 'Gana Inmunidad a un tipo de daño.', restriction: null },
+  { name: 'Inmunidad a estado', cost: 2, category: 'Defensivos', description: 'La criatura es inmune a un estado alterado seleccionado.', restriction: null },
   { name: 'Vulnerable', cost: 'Gana 2', category: 'Defensivos', description: 'Gana Vulnerabilidad a un tipo de daño. (Te devuelve 2 PR).', restriction: null },
   { name: 'Piel Gruesa', cost: 1, category: 'Defensivos', description: 'Ignora 1 punto de daño de todas las fuentes. (Comprable varias veces).', restriction: null },
   { name: 'Indomable', cost: 2, category: 'Defensivos', description: 'Es inmune a los estados Asustado y Controlado.', restriction: null },
@@ -254,6 +265,7 @@ const ALL_TRAITS: Trait[] = [
   { name: 'Muerte Explosiva', cost: 1, category: 'Defensivos', description: 'Cuando la criatura es reducida a 0 de Resistencia, su cuerpo explota, infligiendo 1d6 de daño a todas las criaturas a 5 metros a su alrededor.', restriction: null },
   { name: 'Muerte Explosiva Mayor', cost: 2, category: 'Defensivos', description: 'Cuando la criatura es reducida a 0 de Resistencia, su cuerpo detona violentamente, infligiendo 2d6 de daño a todas las criaturas a 10 metros a su alrededor.', restriction: null },
   { name: 'Absorción de Daño', cost: 2, category: 'Defensivos', description: 'Gana Resistencia a un tipo de daño elegido. La criatura recupera 1 punto de Resistencia por cada punto de daño reducido por esta resistencia.', restriction: null },
+  // Movilidad
   { name: 'Movimiento Especial', cost: 1, category: 'Movilidad', description: 'Gana una velocidad de Nadar, Trepar o Excavar.', restriction: null },
   { name: 'Velocidad Increíble', cost: 1, category: 'Movilidad', description: 'Su velocidad terrestre aumenta en 5 metros.', restriction: null },
   { name: 'Pies Ligeros', cost: 1, category: 'Movilidad', description: 'Ignora el terreno difícil.', restriction: null },
@@ -270,6 +282,7 @@ const ALL_TRAITS: Trait[] = [
   { name: 'Acechador de las Sombras', cost: 2, category: 'Movilidad', description: 'Puede usar la Acción Rápida para teletransportarse 5 metros de una sombra a otra.', restriction: 'Corrupto, Espíritu' },
   { name: 'Paso Etéreo', cost: 3, category: 'Movilidad', description: 'Como Acción Principal, puede moverse a través de objetos y criaturas hasta el final de su turno.', restriction: 'Espíritu' },
   { name: 'Nómada del Plano', cost: 3, category: 'Movilidad', description: 'Una vez al día, puede teletransportarse a cualquier lugar que haya visto, sin importar la distancia.', restriction: 'Exaltado, Espíritu' },
+  // Aura y Percepción
   { name: 'Sentidos Agudos', cost: 1, category: 'Aura y Percepción', description: 'Gana ventaja en todas las tiradas de percepción.', restriction: null },
   { name: 'Visión en la Oscuridad', cost: 1, category: 'Aura y Percepción', description: 'Puede ver en la oscuridad total.', restriction: null },
   { name: 'Sentido del Peligro', cost: 2, category: 'Aura y Percepción', description: 'No puede ser sorprendida en combate.', restriction: null },
@@ -286,8 +299,9 @@ const ALL_TRAITS: Trait[] = [
   { name: 'Aura Antimagia', cost: 4, category: 'Aura y Percepción', description: 'Cualquiera que intente usar una Técnica a 10m de la criatura debe superar una tirada de Aura (ND 14) o la técnica falla.', restriction: 'Artificial, Exaltado' },
   { name: 'Mirada Hipnótica', cost: 2, category: 'Aura y Percepción', description: 'Quien inicie su turno mirando a los ojos de la criatura debe superar una Salvación de Aura (ND 13) o no podrá atacar a la criatura en ese turno.', restriction: null },
   { name: 'Campo de Interferencia', cost: 2, category: 'Aura y Percepción', description: 'Los ataques a distancia contra la criatura tienen desventaja.', restriction: 'Artificial' },
+  // Control y Únicos
   { name: 'Jefe Solitario', cost: 3, category: 'Control y Únicos', description: 'Puede realizar una Acción Rápida al final del turno de cada jugador.', restriction: null },
-  { name: 'Mente Colmena', cost: 1, category: 'Control y Únicos', description: 'Es inmune al estado Asustado mientras pueda ver a otra criatura aliada con este rasgo.', restriction: 'Bestia, Artificial' },
+  { name: 'Mente Colmena', cost: 1, category: 'Control y Únicos', description: 'Es inmune al estado Asustado mientras possa ver a otra criatura aliada con este rasgo.', restriction: 'Bestia, Artificial' },
   { name: 'Líder de la Manada', cost: 2, category: 'Control y Únicos', description: 'Los aliados a 10m que puedan ver a la criatura ganan un bono de +1 a sus tiradas de ataque.', restriction: 'Bestia' },
   { name: 'Último Aliento', cost: 2, category: 'Control y Únicos', description: 'Cuando muere, explota o libera una nube tóxica. Todos a 3m sufren 2d6 de daño o un efecto.', restriction: null },
   { name: 'Reanimar', cost: 3, category: 'Control y Únicos', description: 'Una vez al día, puede usar su Reacción para reanimar a un humanoide que muera a 5m como un zombi de ND 1/4 bajo su control.', restriction: 'Corrupto' },
@@ -411,6 +425,31 @@ const DamageTypeModal = ({ trait, isOpen, onClose, onConfirm }) => {
             <label htmlFor="damageTypeSelect" className="sr-only">Tipo de Daño</label>
             <select id="damageTypeSelect" value={selectedType} onChange={e => setSelectedType(e.target.value)} className="w-full bg-stone-700 border border-stone-600 rounded-md shadow-sm py-2 px-3 text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-600">
                 {DAMAGE_TYPES.map(type => <option key={type} value={type}>{type}</option>)}
+            </select>
+        </div>
+        <div className="mt-8 flex justify-end gap-4">
+            <button onClick={onClose} className="px-6 py-2 bg-stone-600 hover:bg-stone-500 text-stone-100 font-semibold rounded-lg shadow-md transition-colors">Cancelar</button>
+            <button onClick={handleConfirm} className="px-6 py-2 bg-amber-700 hover:bg-amber-600 text-stone-100 font-semibold rounded-lg shadow-md transition-colors">Confirmar</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- StatusEffectModal ---
+const StatusEffectModal = ({ trait, isOpen, onClose, onConfirm }) => {
+  const [selectedEffect, setSelectedEffect] = useState(STATUS_EFFECTS[0]);
+  if (!isOpen) return null;
+  const handleConfirm = () => { onConfirm(trait, selectedEffect); };
+  return (
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fade-in-fast" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="status-effect-modal-title">
+      <div className="bg-stone-800 rounded-lg shadow-2xl border border-stone-700 w-full max-w-sm p-6 m-4 animate-fade-in" onClick={e => e.stopPropagation()}>
+        <h3 id="status-effect-modal-title" className="text-2xl font-bold text-amber-500 mb-4 text-center">Seleccionar Estado para "{trait.name}"</h3>
+        <p className="text-stone-400 text-center mb-6">Elige qué estado alterado afectará este rasgo.</p>
+        <div className="space-y-4">
+            <label htmlFor="statusEffectSelect" className="sr-only">Estado Alterado</label>
+            <select id="statusEffectSelect" value={selectedEffect} onChange={e => setSelectedEffect(e.target.value)} className="w-full bg-stone-700 border border-stone-600 rounded-md shadow-sm py-2 px-3 text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-600">
+                {STATUS_EFFECTS.map(effect => <option key={effect} value={effect}>{effect}</option>)}
             </select>
         </div>
         <div className="mt-8 flex justify-end gap-4">
@@ -550,6 +589,13 @@ const getTraitDisplayInfo = (trait) => {
     } else if (trait.appliedData?.movementType) {
         displayName = `${trait.name} (${trait.appliedData.movementType})`;
         displayDescription = displayDescription.replace('Nadar, Trepar o Excavar', trait.appliedData.movementType);
+    } else if (trait.appliedData?.statusEffect) {
+        displayName = `${trait.name} (${trait.appliedData.statusEffect})`;
+        if (trait.name === 'Estado añadido') {
+            displayDescription = `Al impactar con un ataque, el objetivo debe superar una Salvación de Aura (ND 12) o sufrir el estado ${trait.appliedData.statusEffect}.`;
+        } else if (trait.name === 'Inmunidad a estado') {
+             displayDescription = `La criatura es inmune al estado ${trait.appliedData.statusEffect}.`;
+        }
     }
     return { displayName, displayDescription };
 }
@@ -624,15 +670,24 @@ const CreatureSheet = ({ creature }) => {
       return [...weaponAttacks, ...creature.attacks];
   }, [creature.equippedWeapons, creature.attacks]);
 // Fix: Added explicit types to arrays and Map to ensure type safety and correct inference downstream, preventing errors with component props.
-const { vulnerabilities, resistances, immunities, otherTraits } = useMemo(() => {
+// Fix: Add an explicit type parameter to useMemo to ensure correct type inference for the returned object.
+const { vulnerabilities, resistances, immunities, statusImmunities, otherTraits } = useMemo<{
+    vulnerabilities: DamageType[];
+    resistances: DamageType[];
+    immunities: DamageType[];
+    statusImmunities: StatusEffect[];
+    otherTraits: { trait: Trait; count: number }[];
+  }>(() => {
     const vulnerabilities: DamageType[] = [];
     const resistances: DamageType[] = [];
     const immunities: DamageType[] = [];
+    const statusImmunities: StatusEffect[] = [];
     const otherTraitCounts = new Map<string, { trait: Trait; count: number }>();
     creature.traits.filter(trait => !trait.isCategoryAbility).forEach(trait => {
         if (trait.name === 'Vulnerable' && trait.appliedData?.damageType) { vulnerabilities.push(trait.appliedData.damageType); }
         else if (trait.name === 'Resistente' && trait.appliedData?.damageType) { resistances.push(trait.appliedData.damageType); }
         else if (trait.name === 'Inmune' && trait.appliedData?.damageType) { immunities.push(trait.appliedData.damageType); }
+        else if (trait.name === 'Inmunidad a estado' && trait.appliedData?.statusEffect) { statusImmunities.push(trait.appliedData.statusEffect); }
         else {
             const key = `${trait.name}|${JSON.stringify(trait.appliedData ?? {})}`;
             if (otherTraitCounts.has(key)) {
@@ -642,8 +697,9 @@ const { vulnerabilities, resistances, immunities, otherTraits } = useMemo(() => 
             else { otherTraitCounts.set(key, { trait: trait, count: 1 }); }
         }
     });
-    return { vulnerabilities, resistances, immunities, otherTraits: Array.from(otherTraitCounts.values()) };
+    return { vulnerabilities, resistances, immunities, statusImmunities, otherTraits: Array.from(otherTraitCounts.values()) };
   }, [creature.traits]);
+
   const handleConfirmExport = (options) => {
     let textToCopy = '';
     const equipmentList = [...creature.equippedWeapons.map(w => getEquipmentNameWithBonus(w, 'weapon')), creature.equippedArmor ? getEquipmentNameWithBonus(creature.equippedArmor, 'armor') : null, creature.equippedShield ? getEquipmentNameWithBonus(creature.equippedShield, 'shield') : null].filter(Boolean).join(', ');
@@ -680,6 +736,7 @@ const { vulnerabilities, resistances, immunities, otherTraits } = useMemo(() => 
         if (vulnerabilities.length > 0) textToCopy += `Vulnerable a: ${vulnerabilities.join(', ')}\n`;
         if (resistances.length > 0) textToCopy += `Resistente a: ${resistances.join(', ')}\n`;
         if (immunities.length > 0) textToCopy += `Inmune a: ${immunities.join(', ')}\n`;
+        if (statusImmunities.length > 0) textToCopy += `Inmune a Estados: ${statusImmunities.join(', ')}\n`;
         if (equipmentList) { textToCopy += `Equipo: ${equipmentList}\n`; }
         textToCopy += `Naturaleza: ${allNatures.join(', ')}.\n`;
         textToCopy += `------------------------------------\n`;
@@ -711,13 +768,42 @@ const { vulnerabilities, resistances, immunities, otherTraits } = useMemo(() => 
             });
         }
     }
-    navigator.clipboard.writeText(textToCopy.trim()).then(() => {
-        setCopyText('¡Copiado!'); setTimeout(() => setCopyText('Exportar a Texto'), 2000);
-    }).catch(err => {
-        console.error('Failed to copy text: ', err); setCopyText('Error al copiar'); setTimeout(() => setCopyText('Exportar a Texto'), 2000);
-    });
+    
+    const copyToClipboard = (text: string) => {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => {
+          setCopyText('¡Copiado!');
+          setTimeout(() => setCopyText('Exportar a Texto'), 2000);
+        }).catch(err => {
+          console.error('Error al copiar con la API moderna: ', err);
+          setCopyText('Error al copiar');
+          setTimeout(() => setCopyText('Exportar a Texto'), 2000);
+        });
+      } else {
+        try {
+          const textArea = document.createElement("textarea");
+          textArea.value = text;
+          textArea.style.position = "fixed";
+          textArea.style.top = "-9999px";
+          textArea.style.left = "-9999px";
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+          setCopyText('¡Copiado!');
+          setTimeout(() => setCopyText('Exportar a Texto'), 2000);
+        } catch (err) {
+          console.error('Error al copiar con el método de respaldo: ', err);
+          setCopyText('Error al copiar');
+          setTimeout(() => setCopyText('Exportar a Texto'), 2000);
+        }
+      }
+    };
+    
+    copyToClipboard(textToCopy.trim());
     setIsExportModalOpen(false);
   };
+  
   const handleExportAsImage = async () => {
       if (!sheetRef.current || typeof (window).html2canvas === 'undefined') {
         console.error('Sheet element not found or html2canvas not loaded.');
@@ -794,6 +880,7 @@ const { vulnerabilities, resistances, immunities, otherTraits } = useMemo(() => 
                       {vulnerabilities.length > 0 && (<div className="p-1"><strong className="text-stone-400">Vulnerable a:</strong><span className="ml-2 font-semibold text-red-400">{vulnerabilities.join(', ')}</span></div>)}
                       {resistances.length > 0 && (<div className="p-1"><strong className="text-stone-400">Resistente a:</strong><span className="ml-2 font-semibold text-sky-300">{resistances.join(', ')}</span></div>)}
                       {immunities.length > 0 && (<div className="p-1"><strong className="text-stone-400">Inmune a:</strong><span className="ml-2 font-semibold text-amber-300">{immunities.join(', ')}</span></div>)}
+                      {statusImmunities.length > 0 && (<div className="p-1"><strong className="text-stone-400">Inmune a Estados:</strong><span className="ml-2 font-semibold text-purple-300">{statusImmunities.join(', ')}</span></div>)}
                       {equipmentList && (<div className="p-1 pt-2"><strong className="text-stone-400">Equipo:</strong><span className="ml-2 font-semibold text-stone-200">{equipmentList}</span></div>)}
                     </div>
                 </div>
@@ -1212,6 +1299,7 @@ const TraitSelector = ({ creature, addTrait, removeTrait }) => {
   const [configuringConceptTrait, setConfiguringConceptTrait] = useState(null);
   const [configuringNatureTrait, setConfiguringNatureTrait] = useState(null);
   const [configuringMovementTrait, setConfiguringMovementTrait] = useState(null);
+  const [configuringStatusEffectTrait, setConfiguringStatusEffectTrait] = useState(null);
   const basePr = useMemo(() => ND_MAP[creature.nd].pr, [creature.nd]);
   const { prSpent, prGained } = useMemo(() => { return creature.traits.reduce((acc, trait) => { if (typeof trait.cost === 'number') { acc.prSpent += trait.cost; } else if (typeof trait.cost === 'string' && trait.cost.startsWith('Gana')) { acc.prGained += parseInt(trait.cost.split(' ')[1], 10); } return acc; }, { prSpent: 0, prGained: 0 }); }, [creature.traits]);
   const prBudget = basePr + prGained;
@@ -1219,17 +1307,18 @@ const TraitSelector = ({ creature, addTrait, removeTrait }) => {
   const groupedTraits = useMemo(() => {
     const availableTraits = ALL_TRAITS.filter(t => t.name !== 'Mejora de Atributo' && t.name !== 'Deficiencia de Atributo');
     // Fix: Provide a type for the initial accumulator in reduce to avoid 'traits' being of type 'unknown'.
-    const initialValue: Record<TraitCategory, Trait[]> = {};
-    return availableTraits.reduce((acc, trait) => { 
+    // Fix: Explicitly type the accumulator ('acc') in the reduce function to ensure correct type inference for 'groupedTraits'.
+    return availableTraits.reduce((acc: Record<TraitCategory, Trait[]>, trait) => { 
         const category = trait.category; 
         if (!acc[category]) { acc[category] = []; } 
         acc[category].push(trait); 
         return acc; 
-    }, initialValue);
+    }, {} as Record<TraitCategory, Trait[]>);
   }, []);
   const handleToggleCategory = (category) => { setOpenCategory(prev => (prev === category ? null : category)); };
   const handleAddTraitClick = (trait) => {
     if (['Vulnerable', 'Resistente', 'Inmune', 'Absorción de Daño'].includes(trait.name)) { setConfiguringDamageTrait(trait); }
+    else if (['Inmunidad a estado', 'Estado añadido'].includes(trait.name)) { setConfiguringStatusEffectTrait(trait); }
     else if (trait.name === 'Versatilidad Conceptual') { setConfiguringConceptTrait(trait); }
     else if (trait.name === 'Versatilidad de Carácter') { setConfiguringNatureTrait(trait); }
     else if (trait.name === 'Movimiento Especial') { setConfiguringMovementTrait(trait); }
@@ -1239,9 +1328,12 @@ const TraitSelector = ({ creature, addTrait, removeTrait }) => {
   const handleConfirmConcept = (trait, selectedConcept) => { const newTrait = { ...trait, appliedData: { ...trait.appliedData, concepto: selectedConcept } }; addTrait(newTrait); setConfiguringConceptTrait(null); };
   const handleConfirmNature = (trait, selectedNature) => { const newTrait = { ...trait, appliedData: { ...trait.appliedData, nature: selectedNature } }; addTrait(newTrait); setConfiguringNatureTrait(null); };
   const handleConfirmMovementType = (trait, selectedType) => { const newTrait = { ...trait, appliedData: { ...trait.appliedData, movementType: selectedType } }; addTrait(newTrait); setConfiguringMovementTrait(null); };
+  const handleConfirmStatusEffect = (trait, selectedEffect) => { const newTrait = { ...trait, appliedData: { ...trait.appliedData, statusEffect: selectedEffect } }; addTrait(newTrait); setConfiguringStatusEffectTrait(null); };
+
   return (
     <>
       {configuringDamageTrait && (<DamageTypeModal isOpen={!!configuringDamageTrait} trait={configuringDamageTrait} onClose={() => setConfiguringDamageTrait(null)} onConfirm={handleConfirmDamageType}/>)}
+      {configuringStatusEffectTrait && (<StatusEffectModal isOpen={!!configuringStatusEffectTrait} trait={configuringStatusEffectTrait} onClose={() => setConfiguringStatusEffectTrait(null)} onConfirm={handleConfirmStatusEffect}/>)}
       {configuringConceptTrait && (<ConceptModal isOpen={!!configuringConceptTrait} trait={configuringConceptTrait} onClose={() => setConfiguringConceptTrait(null)} onConfirm={handleConfirmConcept}/>)}
       {configuringNatureTrait && (<NatureModal isOpen={!!configuringNatureTrait} trait={configuringNatureTrait} onClose={() => setConfiguringNatureTrait(null)} onConfirm={handleConfirmNature}/>)}
       {configuringMovementTrait && (<MovementTypeModal isOpen={!!configuringMovementTrait} trait={configuringMovementTrait} onClose={() => setConfiguringMovementTrait(null)} onConfirm={handleConfirmMovementType}/>)}
@@ -1291,6 +1383,7 @@ const TraitSelector = ({ creature, addTrait, removeTrait }) => {
                       else if (trait.appliedData?.concepto) { displayName = `${trait.name} (${trait.appliedData.concepto})`; }
                       else if (trait.appliedData?.nature) { displayName = `${trait.name} (${trait.appliedData.nature})`; }
                       else if (trait.appliedData?.movementType) { displayName = `${trait.name} (${trait.appliedData.movementType})`; }
+                      else if (trait.appliedData?.statusEffect) { displayName = `${trait.name} (${trait.appliedData.statusEffect})`; }
                       return (
                           <div key={trait.instanceId} className={`flex justify-between items-center bg-stone-800 p-2 rounded-md ${isCategoryTrait ? 'bg-amber-900/30 border border-amber-800/50' : ''}`}>
                               <span className="flex-1 min-w-0 text-sm text-stone-300 truncate pr-2">{displayName}{isCategoryTrait && <span className="text-xs text-amber-500 italic ml-2">(Habilidad de Categoría)</span>}</span>
