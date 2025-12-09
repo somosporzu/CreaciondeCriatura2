@@ -155,24 +155,24 @@ interface Creature {
 // ===================================================
 
 const CHALLENGE_RATINGS: ChallengeRating[] = [
-  { nd: '1/8', resistencia: 2, defensa: 9, bonoBase: 0, danoBase: '1d6 - 3', pr: 0 },
-  { nd: '1/4', resistencia: 5, defensa: 10, bonoBase: 0, danoBase: '1d6 - 2', pr: 1 },
-  { nd: '1/2', resistencia: 10, defensa: 10, bonoBase: 1, danoBase: '1d6 - 1', pr: 1 },
-  { nd: '1', resistencia: 15, defensa: 10, bonoBase: 2, danoBase: '1d6', pr: 2 },
-  { nd: '2', resistencia: 25, defensa: 10, bonoBase: 3, danoBase: '1d6+1', pr: 3 },
-  { nd: '3', resistencia: 35, defensa: 11, bonoBase: 4, danoBase: '2d6-1', pr: 4 },
-  { nd: '4', resistencia: 50, defensa: 11, bonoBase: 4, danoBase: '2d6', pr: 5 },
-  { nd: '5', resistencia: 65, defensa: 12, bonoBase: 5, danoBase: '2d6+1', pr: 6 },
-  { nd: '6', resistencia: 70, defensa: 12, bonoBase: 5, danoBase: '2d6+2', pr: 7 },
-  { nd: '7', resistencia: 80, defensa: 13, bonoBase: 6, danoBase: '2d6+2', pr: 8 },
-  { nd: '8', resistencia: 90, defensa: 13, bonoBase: 6, danoBase: '2d6+3', pr: 9 },
-  { nd: '9', resistencia: 100, defensa: 14, bonoBase: 7, danoBase: '3d6', pr: 10 },
-  { nd: '10', resistencia: 110, defensa: 14, bonoBase: 7, danoBase: '3d6+1', pr: 10 },
-  { nd: '11', resistencia: 120, defensa: 14, bonoBase: 7, danoBase: '3d6+1', pr: 11 },
-  { nd: '12', resistencia: 130, defensa: 15, bonoBase: 8, danoBase: '3d6+2', pr: 11 },
-  { nd: '13', resistencia: 140, defensa: 15, bonoBase: 8, danoBase: '4d6', pr: 12 },
-  { nd: '14', resistencia: 150, defensa: 16, bonoBase: 9, danoBase: '4d6+1', pr: 13 },
-  { nd: '15', resistencia: 160, defensa: 16, bonoBase: 9, danoBase: '4d6+2', pr: 14 },
+  { nd: '1/8', resistencia: 4, defensa: 7, bonoBase: 0, danoBase: '1d6 - 3', pr: 0 },
+  { nd: '1/4', resistencia: 7, defensa: 8, bonoBase: 0, danoBase: '1d6 - 2', pr: 1 },
+  { nd: '1/2', resistencia: 12, defensa: 8, bonoBase: 1, danoBase: '1d6 - 1', pr: 1 },
+  { nd: '1', resistencia: 17, defensa: 8, bonoBase: 2, danoBase: '1d6', pr: 2 },
+  { nd: '2', resistencia: 27, defensa: 8, bonoBase: 3, danoBase: '1d6+1', pr: 3 },
+  { nd: '3', resistencia: 37, defensa: 9, bonoBase: 4, danoBase: '2d6-1', pr: 4 },
+  { nd: '4', resistencia: 52, defensa: 9, bonoBase: 4, danoBase: '2d6', pr: 5 },
+  { nd: '5', resistencia: 67, defensa: 10, bonoBase: 5, danoBase: '2d6+1', pr: 6 },
+  { nd: '6', resistencia: 72, defensa: 10, bonoBase: 5, danoBase: '2d6+2', pr: 7 },
+  { nd: '7', resistencia: 82, defensa: 11, bonoBase: 6, danoBase: '2d6+2', pr: 8 },
+  { nd: '8', resistencia: 92, defensa: 11, bonoBase: 6, danoBase: '2d6+3', pr: 9 },
+  { nd: '9', resistencia: 102, defensa: 12, bonoBase: 7, danoBase: '3d6', pr: 10 },
+  { nd: '10', resistencia: 112, defensa: 12, bonoBase: 7, danoBase: '3d6+1', pr: 10 },
+  { nd: '11', resistencia: 122, defensa: 12, bonoBase: 7, danoBase: '3d6+1', pr: 11 },
+  { nd: '12', resistencia: 132, defensa: 13, bonoBase: 8, danoBase: '3d6+2', pr: 11 },
+  { nd: '13', resistencia: 142, defensa: 13, bonoBase: 8, danoBase: '4d6', pr: 12 },
+  { nd: '14', resistencia: 152, defensa: 14, bonoBase: 9, danoBase: '4d6+1', pr: 13 },
+  { nd: '15', resistencia: 162, defensa: 14, bonoBase: 9, danoBase: '4d6+2', pr: 14 },
 ];
 
 const SIZES: Size[] = [
@@ -308,7 +308,7 @@ const ALL_TRAITS: Trait[] = [
   { name: 'Adaptación Rápida', cost: 2, category: 'Control y Únicos', description: 'La primera vez que recibe daño elemental en un combate, gana Resistencia a ese tipo de daño por el resto del encuentro.', restriction: 'Monstruo' },
   { name: 'Dividirse', cost: 3, category: 'Control y Únicos', description: 'Si es reducido a la mitad de su Resistencia por un ataque, se divide en dos criaturas idénticas, cada una con la mitad de la Resistencia actual.', restriction: 'Monstruo, Artificial' },
   { name: 'Absorber Elemento', cost: 3, category: 'Control y Únicos', description: 'Elige un tipo de daño elemental. Es inmune a ese daño y lo absorbe, recuperando Resistencia en lugar de sufrirlo.', restriction: 'Espíritu, Artificial' },
-  { name: 'Resistencia Legendaria', cost: 2, category: 'Control y Únicos', description: 'Puede elegir superar automáticamente una Tirada de Salvación que haya fallado. (Comprable varias veces para ganar más usos diarios).', restriction: null },
+  { name: 'Resistencia Legendaria', cost: 2, category: 'Control y Únicos', description: 'Puede elegir superar automáticamente una Tirada de Salvación que haya fallado. (Comprable varias veces para ganar mais usos diarios).', restriction: null },
   { name: 'Múltiples Cabezas', cost: 2, category: 'Control y Únicos', description: 'Tiene ventaja en las salvaciones contra el estado Aturdido y puede realizar una Reacción adicional por ronda.', restriction: 'Bestia, Monstruo' },
   { name: 'Asimilar', cost: 4, category: 'Control y Únicos', description: 'Una vez por día, al matar a una criatura, puede gastar una Acción Principal para devorarla y ganar uno de sus Rasgos (de coste 2 PR o menos) durante 1 hora.', restriction: 'Monstruo' },
   { name: 'Reflejar Técnica', cost: 3, category: 'Control y Únicos', description: 'Si es el único objetivo de una Técnica, puede usar su Reacción para forzar al lanzador a hacer una Salvación de Aura (ND 15). Si falla, el lanzador es el objetivo en su lugar.', restriction: 'Exaltado, Espíritu' },
@@ -600,7 +600,12 @@ const getTraitDisplayInfo = (trait) => {
     return { displayName, displayDescription };
 }
 // Fix: Moved TraitItem component to top-level to prevent re-declaration and fix 'key' prop type errors.
-const TraitItem = ({ trait, count }: { trait: Trait; count: number }) => {
+// Fix: Use an interface for props to resolve key prop type errors.
+interface TraitItemProps {
+  trait: Trait;
+  count: number;
+}
+const TraitItem = ({ trait, count }: TraitItemProps) => {
     const { displayName, displayDescription } = getTraitDisplayInfo(trait);
     let finalDisplayName = displayName;
     if (count > 1) {
@@ -628,7 +633,7 @@ const CreatureSheet = ({ creature }) => {
     const base = baseStats.resistencia;
     const fromSize = sizeMods.modResistencia;
     const fromTraits = creature.traits.filter(t => t.name === 'Vitalidad Aumentada').length * 10;
-    return Math.max(2, base + fromSize + fromTraits);
+    return Math.max(4, base + fromSize + fromTraits);
   }, [baseStats, sizeMods, creature.traits]);
   const finalDefensa = useMemo(() => {
     const base = baseStats.defensa;
@@ -1279,7 +1284,13 @@ const StepNavigator = ({ currentStep, onStepClick }) => {
 
 // --- TraitSelector ---
 // Fix: Add explicit prop types for the TraitCard component to resolve type errors when using it in a map with a 'key' prop.
-const TraitCard = ({ trait, onAdd, disabled }: { trait: Trait, onAdd: () => void, disabled: boolean }) => {
+// Fix: Use an interface for props to resolve key prop type errors.
+interface TraitCardProps {
+  trait: Trait;
+  onAdd: () => void;
+  disabled: boolean;
+}
+const TraitCard = ({ trait, onAdd, disabled }: TraitCardProps) => {
   const cost = typeof trait.cost === 'number' ? `${trait.cost} PR` : `Gana ${trait.cost.split(' ')[1]} PR`;
   const costColor = typeof trait.cost === 'number' ? 'text-amber-400' : 'text-lime-400';
   return (
@@ -1308,7 +1319,8 @@ const TraitSelector = ({ creature, addTrait, removeTrait }) => {
     const availableTraits = ALL_TRAITS.filter(t => t.name !== 'Mejora de Atributo' && t.name !== 'Deficiencia de Atributo');
     // Fix: Provide a type for the initial accumulator in reduce to avoid 'traits' being of type 'unknown'.
     // Fix: Explicitly type the accumulator ('acc') in the reduce function to ensure correct type inference for 'groupedTraits'.
-    return availableTraits.reduce((acc: Record<TraitCategory, Trait[]>, trait) => { 
+    // Fix: Removed redundant type on `acc` to allow inference from initial value, fixing downstream type errors.
+    return availableTraits.reduce((acc, trait) => { 
         const category = trait.category; 
         if (!acc[category]) { acc[category] = []; } 
         acc[category].push(trait); 
