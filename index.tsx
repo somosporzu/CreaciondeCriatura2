@@ -206,10 +206,14 @@ const DAMAGE_TYPES: DamageType[] = [
 ];
 
 const ALL_CONCEPTS: string[] = [
-    "Artesano", "Bardo", "Cazador", "Constructor", "Cortesano", "Curandero", 
-    "Domador", "Erudito", "Espía", "Espiritista", "Explorador", "Guerrero", 
-    "Hechicero", "Ladrón", "Marinero", "Mercader", "Monje", "Noble", 
-    "Pícaro", "Sacerdote"
+    "Agricultor", "Alfarero", "Artesano", "Astrólogo", "Bardo", 
+    "Botánico", "Carpintero", "Cazador", "Cocinero", "Constructor", 
+    "Cortesano", "Curandero", "Domador", "Erudito", "Espía", 
+    "Espiritista", "Explorador", "Filósofo", "Guerrero", "Hechicero", 
+    "Herrero", "Historiador", "Ingeniero", "Ladrón", "Lingüista", 
+    "Marinero", "Mercader", "Minero", "Monje", "Noble", 
+    "Naturalista", "Pescador", "Pícaro", "Profesor", "Sacerdote", 
+    "Sastre", "Tintorero"
 ];
 
 const MOVEMENT_TYPES: MovementType[] = ['Nadar', 'Trepar', 'Excavar'];
