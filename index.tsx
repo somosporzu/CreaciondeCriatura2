@@ -195,10 +195,11 @@ const CATEGORIES: Category[] = [
 ];
 
 const NATURES: string[] = [
-    "Apasionadamente", "Astutamente", "Brutalmente", "Caóticamente", "Carismáticamente",
-    "Cautelosamente", "Con Optimismo", "Curiosamente", "Despiadadamente", "Elegantemente",
-    "Fríamente", "Impulsivamente", "Inestablemente", "Metódicamente", "Rápidamente",
-    "Silenciosamente", "Siniestrante", "Tenazmente", "Torpemente", "Valientemente"
+    "Alegremente", "Apasionadamente", "Astutamente", "Brutalmente", "Caóticamente",
+    "Carismáticamente", "Cautelosamente", "Curiosamente", "Despiadadamente", "Discretamente",
+    "Elegantemente", "Fríamente", "Impulsivamente", "Inestablemente", "Metódicamente",
+    "Rápidamente", "Silenciosamente", "Siniestramente", "Sutilmente", "Tenazmente",
+    "Torpemente", "Valientemente"
 ];
 
 const DAMAGE_TYPES: DamageType[] = [
