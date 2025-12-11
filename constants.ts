@@ -38,6 +38,7 @@ export const CATEGORIES: Category[] = [
   { name: 'Corrupto', ability: 'Toque Profano: Sus ataques infligen 1d6 de daño Corrosivo adicional.' },
   { name: 'Elemental', ability: 'Toque elemental: Sus ataques infligen 1d6 de daño adicional acorde al elemento del que este hecho.' },
   { name: 'Artificial', ability: 'Mente Mecánica: Es inmune al daño Mental, al estado Asustado y a los venenos.' },
+  { name: 'NPC', ability: 'Vocación: Gana un Concepto gratis.' },
 ];
 
 export const NATURES: string[] = [
@@ -94,6 +95,9 @@ export const ALL_TRAITS: Trait[] = [
   { name: 'Combate a Ciegas', cost: 2, category: 'Ofensivos', description: 'No sufre penalizaciones a sus ataques por no poder ver a su objetivo.', restriction: null },
   { name: 'Ataque Vorpal', cost: 3, category: 'Ofensivos', description: 'En un golpe crítico, el ataque inflige el triple de daño en lugar del doble.', restriction: null },
   { name: 'Ráfaga', cost: 3, category: 'Ofensivos', description: 'Si reduce a una criatura a 0 de Resistencia, puede realizar un ataque adicional como Acción Rápida.', restriction: null },
+  { name: 'Drenaje menor', cost: 2, category: 'Ofensivos', description: 'Al realizar daño con uno de sus ataques recupera la mitad del daño realizado como resistencia.', restriction: null },
+  { name: 'Drenaje', cost: 3, category: 'Ofensivos', description: 'Al realizar daño con uno de sus ataques recupera la misma cantidad de resistencia que el daño realizado.', restriction: null },
+  { name: 'Inducir fatiga', cost: 3, category: 'Ofensivos', description: 'Al realizar daño con uno de sus ataques el objetivo obtiene un nivel de fatiga.', restriction: null },
   // Defensivos
   { name: 'Armadura Natural', cost: 1, category: 'Defensivos', description: '+1 a la Defensa. (Comprable varias veces).', restriction: null },
   { name: 'Resistente', cost: 1, category: 'Defensivos', description: 'Gana Resistencia a un tipo de daño.', restriction: null },
@@ -116,6 +120,9 @@ export const ALL_TRAITS: Trait[] = [
   { name: 'Muerte Explosiva', cost: 1, category: 'Defensivos', description: 'Cuando la criatura es reducida a 0 de Resistencia, su cuerpo explota, infligiendo 1d6 de daño a todas las criaturas a 5 metros a su alrededor.', restriction: null },
   { name: 'Muerte Explosiva Mayor', cost: 2, category: 'Defensivos', description: 'Cuando la criatura es reducida a 0 de Resistencia, su cuerpo detona violentamente, infligiendo 2d6 de daño a todas las criaturas a 10 metros a su alrededor.', restriction: null },
   { name: 'Absorción de Daño', cost: 2, category: 'Defensivos', description: 'Gana Resistencia a un tipo de daño elegido. La criatura recupera 1 punto de Resistencia por cada punto de daño reducido por esta resistencia.', restriction: null },
+  { name: 'Recuperación Menor', cost: 1, category: 'Defensivos', description: 'En vez de atacar, la criatura recupera 1d6 puntos de resistencia.', restriction: null },
+  { name: 'Recuperación', cost: 2, category: 'Defensivos', description: 'En vez de atacar, la criatura recupera 1d6+1 puntos de resistencia.', restriction: null },
+  { name: 'Recuperación Mayor', cost: 3, category: 'Defensivos', description: 'En vez de atacar, la criatura recupera 3d6+3 puntos de resistencia.', restriction: null },
   // Movilidad
   { name: 'Movimiento Especial', cost: 1, category: 'Movilidad', description: 'Gana una velocidad de Nadar, Trepar o Excavar.', restriction: null },
   { name: 'Iniciativa Mejorada', cost: 1, category: 'Movilidad', description: 'Aumenta la iniciativa en 3. (Comprable varias veces).', restriction: null },

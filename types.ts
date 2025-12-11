@@ -1,6 +1,6 @@
 export type ChallengeRatingKey = '1/8' | '1/4' | '1/2' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11' | '12' | '13' | '14' | '15';
 export type SizeKey = 'Minúsculo' | 'Pequeño' | 'Mediano' | 'Grande' | 'Enorme' | 'Colosal';
-export type CategoryKey = 'Bestia' | 'Monstruo' | 'Espíritu' | 'Exaltado' | 'Corrupto' | 'Elemental' | 'Artificial';
+export type CategoryKey = 'Bestia' | 'Monstruo' | 'Espíritu' | 'Exaltado' | 'Corrupto' | 'Elemental' | 'Artificial' | 'NPC';
 export type TraitCategory = 'Atributos y Vitalidad' | 'Ofensivos' | 'Defensivos' | 'Movilidad' | 'Aura y Percepción' | 'Control y Únicos';
 export type DamageType = 'Cortante' | 'Penetrante' | 'Contundente' | 'Fuego' | 'Hielo' | 'Eléctrico' | 'Corrosivo' | 'Radiante' | 'Mental' | 'Variable';
 export type MovementType = 'Nadar' | 'Trepar' | 'Excavar';
