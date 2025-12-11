@@ -259,7 +259,7 @@ const ALL_TRAITS: Trait[] = [
   { name: 'Fortaleza Interior', cost: 1, category: 'Defensivos', description: 'Tiene ventaja en las Tiradas de Salvación contra veneno y enfermedades.', restriction: null },
   { name: 'Piel Resbaladiza', cost: 1, category: 'Defensivos', description: 'Tiene ventaja en las tiradas para evitar o escapar de una presa (Apresar).', restriction: null },
   { name: 'Desplazamiento', cost: 3, category: 'Defensivos', description: 'Los ataques contra la criatura tienen desventaja. Si es golpeada, este rasgo se desactiva hasta el inicio de su próximo turno.', restriction: null },
-  { name: 'Amorfo', cost: 3, category: 'Defensivos', description: 'Es inmune a los golpes críticos y no puede ser apresado.', restriction: 'Monstruo' },
+  { name: 'Amorfo', cost: 3, category: 'Defensivos', description: 'Es inmune al golpes críticos y no puede ser apresado.', restriction: 'Monstruo' },
   { name: 'Corazón Doble', cost: 3, category: 'Defensivos', description: 'La primera vez que llega a 0 de Resistencia en un combate, en su lugar, se queda con la mitad de su Resistencia máxima (redondeado hacia abajo).', restriction: null },
   { name: 'Duro de Matar', cost: 2, category: 'Defensivos', description: 'Si llega a 0 de Resistencia, no cae Agotado inmediatamente. Puede actuar normalmente en su próximo turno y luego cae.', restriction: null },
   { name: 'Muerte Explosiva', cost: 1, category: 'Defensivos', description: 'Cuando la criatura es reducida a 0 de Resistencia, su cuerpo explota, infligiendo 1d6 de daño a todas las criaturas a 5 metros a su alrededor.', restriction: null },
@@ -599,13 +599,12 @@ const getTraitDisplayInfo = (trait) => {
     }
     return { displayName, displayDescription };
 }
-// Fix: Moved TraitItem component to top-level to prevent re-declaration and fix 'key' prop type errors.
-// Fix: Use an interface for props to resolve key prop type errors.
+
 interface TraitItemProps {
   trait: Trait;
   count: number;
 }
-const TraitItem = ({ trait, count }: TraitItemProps) => {
+const TraitItem: React.FC<TraitItemProps> = ({ trait, count }) => {
     const { displayName, displayDescription } = getTraitDisplayInfo(trait);
     let finalDisplayName = displayName;
     if (count > 1) {
@@ -643,8 +642,11 @@ const CreatureSheet = ({ creature }) => {
     const fromShield = (creature.equippedShield?.shield.defenseBonus || 0) + (creature.equippedShield?.bonus || 0);
     return base + fromSize + fromTraits + fromArmor + fromShield;
   }, [baseStats, sizeMods, creature.traits, creature.equippedArmor, creature.equippedShield]);
+  const finalIniciativa = useMemo(() => {
+      return (creature.attributes.destreza + creature.attributes.aura) - 2;
+  }, [creature.attributes.destreza, creature.attributes.aura]);
   const movementDisplay = useMemo(() => {
-    const landSpeed = 5 + creature.attributes.destreza + (creature.traits.filter(t => t.name === 'Velocidad Increíble').length * 5);
+    const landSpeed = 9 + creature.attributes.destreza + (creature.traits.filter(t => t.name === 'Velocidad Increíble').length * 5);
     const specialMovements = new Set();
     creature.traits.forEach(trait => {
         if (trait.name === 'Vuelo') { specialMovements.add(`Vuelo ${landSpeed}m`); }
@@ -674,8 +676,7 @@ const CreatureSheet = ({ creature }) => {
       });
       return [...weaponAttacks, ...creature.attacks];
   }, [creature.equippedWeapons, creature.attacks]);
-// Fix: Added explicit types to arrays and Map to ensure type safety and correct inference downstream, preventing errors with component props.
-// Fix: Add an explicit type parameter to useMemo to ensure correct type inference for the returned object.
+
 const { vulnerabilities, resistances, immunities, statusImmunities, otherTraits } = useMemo<{
     vulnerabilities: DamageType[];
     resistances: DamageType[];
@@ -696,7 +697,6 @@ const { vulnerabilities, resistances, immunities, statusImmunities, otherTraits 
         else {
             const key = `${trait.name}|${JSON.stringify(trait.appliedData ?? {})}`;
             if (otherTraitCounts.has(key)) {
-                // Fix: Add a non-null assertion as `has` check guarantees existence.
                 otherTraitCounts.get(key)!.count++;
             }
             else { otherTraitCounts.set(key, { trait: trait, count: 1 }); }
@@ -710,7 +710,7 @@ const { vulnerabilities, resistances, immunities, statusImmunities, otherTraits 
     const equipmentList = [...creature.equippedWeapons.map(w => getEquipmentNameWithBonus(w, 'weapon')), creature.equippedArmor ? getEquipmentNameWithBonus(creature.equippedArmor, 'armor') : null, creature.equippedShield ? getEquipmentNameWithBonus(creature.equippedShield, 'shield') : null].filter(Boolean).join(', ');
     if (options.format === 'simple') {
         textToCopy += `${creature.name.toUpperCase()} (ND ${creature.nd})\n`;
-        textToCopy += `Res: ${finalResistencia}, Def: ${finalDefensa}, Mov: ${movementDisplay}\n`;
+        textToCopy += `Res: ${finalResistencia}, Def: ${finalDefensa}, Ini: ${finalIniciativa >= 0 ? '+' : ''}${finalIniciativa}, Mov: ${movementDisplay}\n`;
         textToCopy += `Cuerpo: ${creature.attributes.cuerpo > 0 ? '+' : ''}${creature.attributes.cuerpo}, Destreza: ${creature.attributes.destreza > 0 ? '+' : ''}${creature.attributes.destreza}, Aura: ${creature.attributes.aura > 0 ? '+' : ''}${creature.attributes.aura}\n`;
         if (options.includeAttacks && finalAttacks.length > 0) {
             const attacksText = finalAttacks.map(attack => {
@@ -737,7 +737,7 @@ const { vulnerabilities, resistances, immunities, statusImmunities, otherTraits 
         textToCopy += `${creature.name.toUpperCase()}\n`;
         textToCopy += `${creature.size} ${fullCategory} (ND ${creature.nd})\n`;
         textToCopy += `------------------------------------\n`;
-        textToCopy += `Resistencia: ${finalResistencia}\nDefensa: ${finalDefensa}\nMovimiento: ${movementDisplay}\n`;
+        textToCopy += `Resistencia: ${finalResistencia}\nDefensa: ${finalDefensa}\nIniciativa: ${finalIniciativa >= 0 ? '+' : ''}${finalIniciativa}\nMovimiento: ${movementDisplay}\n`;
         if (vulnerabilities.length > 0) textToCopy += `Vulnerable a: ${vulnerabilities.join(', ')}\n`;
         if (resistances.length > 0) textToCopy += `Resistente a: ${resistances.join(', ')}\n`;
         if (immunities.length > 0) textToCopy += `Inmune a: ${immunities.join(', ')}\n`;
@@ -881,6 +881,7 @@ const { vulnerabilities, resistances, immunities, statusImmunities, otherTraits 
                     </div>
                     <hr className="border-stone-700"/>
                     <div className="space-y-1 text-sm">
+                      <div className="p-1"><strong className="text-stone-400">Iniciativa:</strong><span className="ml-2 font-semibold text-amber-500">{finalIniciativa >= 0 ? '+' : ''}{finalIniciativa}</span></div>
                       <div className="p-1"><strong className="text-stone-400">Movimiento:</strong><span className="ml-2 font-semibold text-lime-400">{movementDisplay}</span></div>
                       {vulnerabilities.length > 0 && (<div className="p-1"><strong className="text-stone-400">Vulnerable a:</strong><span className="ml-2 font-semibold text-red-400">{vulnerabilities.join(', ')}</span></div>)}
                       {resistances.length > 0 && (<div className="p-1"><strong className="text-stone-400">Resistente a:</strong><span className="ml-2 font-semibold text-sky-300">{resistances.join(', ')}</span></div>)}
@@ -1283,14 +1284,12 @@ const StepNavigator = ({ currentStep, onStepClick }) => {
 };
 
 // --- TraitSelector ---
-// Fix: Add explicit prop types for the TraitCard component to resolve type errors when using it in a map with a 'key' prop.
-// Fix: Use an interface for props to resolve key prop type errors.
 interface TraitCardProps {
   trait: Trait;
   onAdd: () => void;
   disabled: boolean;
 }
-const TraitCard = ({ trait, onAdd, disabled }: TraitCardProps) => {
+const TraitCard: React.FC<TraitCardProps> = ({ trait, onAdd, disabled }) => {
   const cost = typeof trait.cost === 'number' ? `${trait.cost} PR` : `Gana ${trait.cost.split(' ')[1]} PR`;
   const costColor = typeof trait.cost === 'number' ? 'text-amber-400' : 'text-lime-400';
   return (
@@ -1317,9 +1316,6 @@ const TraitSelector = ({ creature, addTrait, removeTrait }) => {
   const prRemaining = prBudget - prSpent;
   const groupedTraits = useMemo(() => {
     const availableTraits = ALL_TRAITS.filter(t => t.name !== 'Mejora de Atributo' && t.name !== 'Deficiencia de Atributo');
-    // Fix: Provide a type for the initial accumulator in reduce to avoid 'traits' being of type 'unknown'.
-    // Fix: Explicitly type the accumulator ('acc') in the reduce function to ensure correct type inference for 'groupedTraits'.
-    // Fix: Removed redundant type on `acc` to allow inference from initial value, fixing downstream type errors.
     return availableTraits.reduce((acc, trait) => { 
         const category = trait.category; 
         if (!acc[category]) { acc[category] = []; } 
@@ -1364,7 +1360,7 @@ const TraitSelector = ({ creature, addTrait, removeTrait }) => {
                           <div id={categoryId} className={`transition-all duration-500 ease-in-out overflow-hidden ${isOpen ? 'max-h-[2000px]' : 'max-h-0'}`}>
                               <div className="p-4 border-t border-stone-700/50">
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                      {traits.map(trait => (<TraitCard key={trait.name} trait={trait} onAdd={() => handleAddTraitClick(trait)} disabled={typeof trait.cost === 'number' && prRemaining < trait.cost}/>))}
+                                      {(traits as Trait[]).map(trait => (<TraitCard key={trait.name} trait={trait} onAdd={() => handleAddTraitClick(trait)} disabled={typeof trait.cost === 'number' && prRemaining < trait.cost}/>))}
                                   </div>
                               </div>
                           </div>
