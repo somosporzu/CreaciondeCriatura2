@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { 
   ChallengeRatingKey, SizeKey, CategoryKey, TraitCategory, DamageType, MovementType, StatusEffect,
@@ -262,7 +263,10 @@ const CreatureSheet = ({ creature }) => {
     const additionalNatures = creature.traits.filter(t => t.name === 'Versatilidad de Carácter' && t.appliedData?.nature).map(t => t.appliedData.nature);
     return [...creature.natures, ...additionalNatures];
   }, [creature.natures, creature.traits]);
-  const fullCategory = useMemo(() => [creature.category, ...concepts].join(' '), [creature.category, concepts]);
+  const fullCategory = useMemo(() => {
+      const parts = [creature.category, ...concepts].join(' ');
+      return creature.label ? `${parts} (${creature.label})` : parts;
+  }, [creature.category, concepts, creature.label]);
   const finalResistencia = useMemo(() => {
     const base = baseStats.resistencia;
     const fromSize = sizeMods.modResistencia;
@@ -1068,8 +1072,9 @@ const App = () => {
       };
   }, []);
 
-  const getInitialCreature = useCallback(() => ({
+  const getInitialCreature = useCallback((): Creature => ({
     name: 'Nueva Criatura',
+    label: '',
     nd: '1',
     size: 'Mediano',
     category: 'Bestia',
@@ -1080,7 +1085,7 @@ const App = () => {
     equippedWeapons: [],
   }), [createCategoryTrait]);
   
-  const [creature, setCreature] = useState(getInitialCreature);
+  const [creature, setCreature] = useState<Creature>(getInitialCreature);
   const [step, setStep] = useState(1);
   const [savedCreatures, setSavedCreatures] = useState([]);
 
@@ -1266,17 +1271,21 @@ const App = () => {
                   {SIZES.map(s => <option key={s.name} value={s.name}>{s.name}</option>)}
                 </select>
               </div>
+               <div>
+                    <label htmlFor="nature" className="block text-sm font-medium text-stone-300 mb-1">Naturaleza Inicial</label>
+                    <select id="nature" value={creature.natures[0]} onChange={(e) => { const newNatures = [...creature.natures]; newNatures[0] = e.target.value; handleCreatureChange('natures', newNatures); }} className="w-full bg-stone-700 border border-stone-600 rounded-md shadow-sm py-2 px-3 text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-600">
+                      {NATURES.map(n => <option key={n} value={n}>{n}</option>)}
+                    </select>
+              </div>
               <div>
                 <label htmlFor="category" className="block text-sm font-medium text-stone-300 mb-1">Categoría</label>
                 <select id="category" value={creature.category} onChange={(e) => handleCreatureChange('category', e.target.value)} className="w-full bg-stone-700 border border-stone-600 rounded-md shadow-sm py-2 px-3 text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-600">
                   {CATEGORIES.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
                 </select>
               </div>
-               <div>
-                    <label htmlFor="nature" className="block text-sm font-medium text-stone-300 mb-1">Naturaleza Inicial</label>
-                    <select id="nature" value={creature.natures[0]} onChange={(e) => { const newNatures = [...creature.natures]; newNatures[0] = e.target.value; handleCreatureChange('natures', newNatures); }} className="w-full bg-stone-700 border border-stone-600 rounded-md shadow-sm py-2 px-3 text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-600">
-                      {NATURES.map(n => <option key={n} value={n}>{n}</option>)}
-                    </select>
+              <div>
+                <label htmlFor="label" className="block text-sm font-medium text-stone-300 mb-1">Etiqueta <span className="text-xs text-stone-500">(Opcional, ej: No-Muerto, Golem)</span></label>
+                <input id="label" type="text" value={creature.label || ''} onChange={(e) => handleCreatureChange('label', e.target.value)} className="w-full bg-stone-700 border border-stone-600 rounded-md shadow-sm py-2 px-3 text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-600" placeholder="Ej: No-Muerto"/>
               </div>
             </div>
             <div className="p-4 bg-stone-900/50 rounded-lg border border-stone-700">

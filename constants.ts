@@ -105,7 +105,7 @@ export const ALL_TRAITS: Trait[] = [
   { name: 'Inmunidad a estado', cost: 2, category: 'Defensivos', description: 'La criatura es inmune a un estado alterado seleccionado.', restriction: null },
   { name: 'Vulnerable', cost: 'Gana 2', category: 'Defensivos', description: 'Gana Vulnerabilidad a un tipo de daño. (Te devuelve 2 PR).', restriction: null },
   { name: 'Piel Gruesa', cost: 1, category: 'Defensivos', description: 'Ignora 1 punto de daño de todas las fuentes. (Comprable varias veces).', restriction: null },
-  { name: 'Indomable', cost: 2, category: 'Defensivos', description: 'Es inmune a los estados Asustado y Controlado.', restriction: null },
+  { name: 'Indomable', cost: 2, category: 'Defensivos', description: 'Es inmune al estados Asustado y Controlado.', restriction: null },
   { name: 'Escurridizo', cost: 1, category: 'Defensivos', description: 'No provoca ataques de oportunidad al moverse fuera del alcance de un enemigo.', restriction: null },
   { name: 'Regeneración Menor', cost: 1, category: 'Defensivos', description: 'Al inicio de su turno, la criatura recupera 3 de Resistencia.', restriction: null },
   { name: 'Regeneración Mayor', cost: 2, category: 'Defensivos', description: 'Al inicio de su turno, la criatura recupera 5 de Resistencia.', restriction: null },
@@ -154,7 +154,7 @@ export const ALL_TRAITS: Trait[] = [
   { name: 'Incorpóreo', cost: 3, category: 'Aura y Percepción', description: 'Tiene Resistencia a todo daño físico y puede moverse a través de objetos y criaturas.', restriction: 'Espíritu' },
   { name: 'Visión Verdadera', cost: 3, category: 'Aura y Percepción', description: 'Puede ver a través de ilusiones e invisibilidad en un radio de 15m.', restriction: 'Artificial' },
   { name: 'Aura de Miedo', cost: 3, category: 'Aura y Percepción', description: 'Quien empiece su turno a 5m debe superar una Salvación de Aura (ND 13) o quedar Asustado.', restriction: 'Monstruo, Corrupto' },
-  { name: 'Aura de Vida', cost: 3, category: 'Aura y Percepción', description: 'Los aliados que empiecen su turno a 5m de la criatura recuperan 1d6 de Resistencia.', restriction: 'Elemental' },
+  { name: 'Aura de Vida', cost: 2, category: 'Aura y Percepción', description: 'Los aliados que empiecen su turno a 5m de la criatura recuperan 1d6 de Resistencia.', restriction: null },
   { name: 'Aura Antimagia', cost: 4, category: 'Aura y Percepción', description: 'Cualquiera que intente usar una Técnica a 10m de la criatura debe superar una tirada de Aura (ND 14) o la técnica falla.', restriction: 'Artificial, Exaltado' },
   { name: 'Mirada Hipnótica', cost: 2, category: 'Aura y Percepción', description: 'Quien inicie su turno mirando a los ojos de la criatura debe superar una Salvación de Aura (ND 13) o no podrá atacar a la criatura en ese turno.', restriction: null },
   { name: 'Campo de Interferencia', cost: 2, category: 'Aura y Percepción', description: 'Los ataques a distancia contra la criatura tienen desventaja.', restriction: 'Artificial' },
@@ -166,7 +166,7 @@ export const ALL_TRAITS: Trait[] = [
   { name: 'Reanimar', cost: 3, category: 'Control y Únicos', description: 'Una vez al día, puede usar su Reacción para reanimar a un humanoide que muera a 5m como un zombi de ND 1/4 bajo su control.', restriction: 'Corrupto' },
   { name: 'Adaptación Rápida', cost: 2, category: 'Control y Únicos', description: 'La primera vez que recibe daño elemental en un combate, gana Resistencia a ese tipo de daño por el resto del encuentro.', restriction: 'Monstruo' },
   { name: 'Dividirse', cost: 3, category: 'Control y Únicos', description: 'Si es reducido a la mitad de su Resistencia por un ataque, se divide en dos criaturas idénticas, cada una con la mitad de la Resistencia actual.', restriction: 'Monstruo, Artificial' },
-  { name: 'Absorber Elemento', cost: 3, category: 'Control y Únicos', description: 'Elige un tipo de daño elemental. Es inmune a ese daño y lo absorbe, recuperando Resistencia en lugar de sufrirlo.', restriction: 'Espíritu, Artificial' },
+  { name: 'Absorber Elemento', cost: 3, category: 'Control y Únicos', description: 'Elige un tipo de daño elemental. Es inmune al ese daño y lo absorbe, recuperando Resistencia en lugar de sufrirlo.', restriction: 'Espíritu, Artificial' },
   { name: 'Resistencia Legendaria', cost: 2, category: 'Control y Únicos', description: 'Puede elegir superar automáticamente una Tirada de Salvación que haya fallado. (Comprable varias veces para ganar mais usos diarios).', restriction: null },
   { name: 'Múltiples Cabezas', cost: 2, category: 'Control y Únicos', description: 'Tiene ventaja en las salvaciones contra el estado Aturdido y puede realizar una Reacción adicional por ronda.', restriction: 'Bestia, Monstruo' },
   { name: 'Asimilar', cost: 4, category: 'Control y Únicos', description: 'Una vez por día, al matar a una criatura, puede gastar una Acción Principal para devorarla y ganar uno de sus Rasgos (de coste 2 PR o menos) durante 1 hora.', restriction: 'Monstruo' },
@@ -175,6 +175,7 @@ export const ALL_TRAITS: Trait[] = [
   { name: 'Afinidad con Técnicas', cost: 1, category: 'Control y Únicos', description: 'Por cada PR gastado aquí, la criatura gana 5 Puntos de Creación (PC) para diseñar sus propias Técnicas.', restriction: null },
   { name: 'Grito Reactivo', cost: 2, category: 'Control y Únicos', description: 'La primera vez que sufre daño en un combate, puede usar su Reacción para emitir un grito. Todos a 5m deben hacer una Salvación de Cuerpo (ND 13) o quedarán Aturdidos por 1 turno.', restriction: null },
   { name: 'Invocador Innato', cost: 3, category: 'Control y Únicos', description: 'Al inicio del combate, invoca automáticamente 1d6 criaturas de su misma categoría de un ND igual o inferior a 1/4.', restriction: null },
+  { name: 'Tamaño cambiante', cost: 2, category: 'Control y Únicos', description: 'La criatura puede cambiar su tamaño hasta en dos categorías, este cambio de tamaño otorga los modificadores de Defensa de la categoría de tamaño pero no los de Resistencia.', restriction: null },
 ];
 
 export const ALL_WEAPONS: Weapon[] = [

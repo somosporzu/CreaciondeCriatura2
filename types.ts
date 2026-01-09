@@ -1,3 +1,4 @@
+
 export type ChallengeRatingKey = '1/8' | '1/4' | '1/2' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11' | '12' | '13' | '14' | '15';
 export type SizeKey = 'Minúsculo' | 'Pequeño' | 'Mediano' | 'Grande' | 'Enorme' | 'Colosal';
 export type CategoryKey = 'Bestia' | 'Monstruo' | 'Espíritu' | 'Exaltado' | 'Corrupto' | 'Elemental' | 'Artificial' | 'NPC';
@@ -106,6 +107,7 @@ export interface Attack {
 export interface Creature {
   id?: string;
   name: string;
+  label?: string;
   nd: ChallengeRatingKey;
   size: SizeKey;
   category: CategoryKey;
